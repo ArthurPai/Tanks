@@ -1,9 +1,11 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PhotonManager : Photon.PunBehaviour {
     public static PhotonManager instance;
+    public Text status = null;
 
     void Awake()
     {
@@ -18,18 +20,19 @@ public class PhotonManager : Photon.PunBehaviour {
 
     void Start () {
         PhotonNetwork.ConnectUsingSettings("Tanks_v1.0");
+        ShowMessage("Connecting...");
     }
 
     public override void OnConnectedToPhoton() {
-        Debug.Log("Photon: Connected");
+        ShowMessage("Connected");
     }
 
     public override void OnFailedToConnectToPhoton(DisconnectCause cause) {
-        Debug.Log("Photon: Failed Connect");
+        ShowMessage("Failed Connect");
     }
 
     public override void OnDisconnectedFromPhoton() {
-        Debug.Log("Photon: Disconnected");
+        ShowMessage("Disconnected");
     }
 
     // Room
@@ -38,15 +41,22 @@ public class PhotonManager : Photon.PunBehaviour {
         RoomOptions options = new RoomOptions();
         options.MaxPlayers = 4;
         PhotonNetwork.JoinOrCreateRoom("Kingdom", options, null);
+        ShowMessage("Joining Room...");
     }
 
     public override void OnJoinedRoom()
     {
-        Debug.Log("You are joined room!!");
+        ShowMessage("You are joined room!!");
         // if is Master Client, can create/init and load game scene
         if (PhotonNetwork.isMasterClient)
         {
-            Debug.Log("You are Master Client!!");
+            ShowMessage("You are Master Client!!");
         }
+    }
+
+    void ShowMessage(string msg)
+    {
+        status.text = msg;
+        Debug.Log("Phonton:" + msg);
     }
 }
