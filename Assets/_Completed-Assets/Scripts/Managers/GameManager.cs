@@ -26,25 +26,69 @@ namespace Complete
         private void Start()
         {
             // Create the delays so they only have to be made once.
-            m_StartWait = new WaitForSeconds (m_StartDelay);
-            m_EndWait = new WaitForSeconds (m_EndDelay);
+            m_StartWait = new WaitForSeconds(m_StartDelay);
+            m_EndWait = new WaitForSeconds(m_EndDelay);
 
-            SpawnAllTanks();
-            SetCameraTargets();
+            if (!PhotonNetwork.inRoom)
+                return;
 
-            // Once the tanks have been created and the camera is using them as targets, start the game.
-            StartCoroutine (GameLoop ());
+            if( PhotonNetwork.isMasterClient ) {
+                SpawnMasterTank();
+            } else {
+                SpawnTank2();
+                Invoke("EnterGameLoop", 3);
+            }
+
+            // Create the delays so they only have to be made once.
+//            m_StartWait = new WaitForSeconds (m_StartDelay);
+//            m_EndWait = new WaitForSeconds (m_EndDelay);
+//
+//            SpawnAllTanks();
+//            SetCameraTargets();
+//
+//            // Once the tanks have been created and the camera is using them as targets, start the game.
+//            StartCoroutine (GameLoop ());
         }
 
+        private void SpawnMasterTank()
+        {
+            int i = 0;
+            GameObject tank = PhotonNetwork.Instantiate(
+                "CompleteTank", 
+                m_Tanks[i].m_SpawnPoint.position,
+                m_Tanks[i].m_SpawnPoint.rotation,
+                0) as GameObject;
+
+            tank.name = "MasterTank";
+            m_Tanks[i].m_Instance = tank;
+            m_Tanks[i].m_PlayerNumber = i+1;
+            m_Tanks[i].Setup();
+
+            Debug.Log("SpawnMasterTank");
+        }
+        private void SpawnTank2()
+        {
+            int i = 1;
+            GameObject tank = PhotonNetwork.Instantiate(
+                "CompleteTank", 
+                m_Tanks[i].m_SpawnPoint.position,
+                m_Tanks[i].m_SpawnPoint.rotation,
+                0) as GameObject;
+
+            tank.name = "Tank2";
+            m_Tanks[i].m_Instance = tank;
+            m_Tanks[i].m_PlayerNumber = i+1;
+            m_Tanks[i].Setup();
+
+            Debug.Log("SpawnTank2");
+        }
 
         private void SpawnAllTanks()
         {
             // For all the tanks...
             for (int i = 0; i < m_Tanks.Length; i++)
             {
-                // ... create them, set their player number and references needed for control.
-                m_Tanks[i].m_Instance =
-                    Instantiate(m_TankPrefab, m_Tanks[i].m_SpawnPoint.position, m_Tanks[i].m_SpawnPoint.rotation) as GameObject;
+                m_Tanks[i].m_Instance = Instantiate(m_TankPrefab, m_Tanks[i].m_SpawnPoint.position, m_Tanks[i].m_SpawnPoint.rotation) as GameObject;
                 m_Tanks[i].m_PlayerNumber = i + 1;
                 m_Tanks[i].Setup();
             }

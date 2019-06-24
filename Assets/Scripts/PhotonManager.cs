@@ -51,6 +51,7 @@ public class PhotonManager : Photon.PunBehaviour {
         if (PhotonNetwork.isMasterClient)
         {
             ShowMessage("You are Master Client!!");
+            PhotonNetwork.LoadLevel("GameRoomScene");
         }
     }
 
@@ -58,5 +59,13 @@ public class PhotonManager : Photon.PunBehaviour {
     {
         status.text = msg;
         Debug.Log("Phonton:" + msg);
+    }
+
+    void sceneLoaded(int levelNumber)
+    {
+        // if not in Photon Room, may be network problem
+        if (!PhotonNetwork.inRoom)
+            return;
+        ShowMessage("Game Room Loaded!!");
     }
 }
